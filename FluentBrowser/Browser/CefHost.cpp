@@ -12,6 +12,7 @@ namespace
     class SimpleApp : public CefApp, public CefBrowserProcessHandler
     {
     public:
+        SimpleApp() = default; // DISALLOW_COPY_AND_ASSIGN suppresses the implicit default ctor
         CefRefPtr<CefBrowserProcessHandler> GetBrowserProcessHandler() override { return this; }
         void OnBeforeCommandLineProcessing(const CefString& process_type,
             CefRefPtr<CefCommandLine> command_line) override

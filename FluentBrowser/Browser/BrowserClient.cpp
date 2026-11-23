@@ -32,7 +32,7 @@ void BrowserClient::OnLoadError(CefRefPtr<CefBrowser>, CefRefPtr<CefFrame> frame
     frame->LoadURL("data:text/html;charset=utf-8," + html);
 }
 bool BrowserClient::CanDownload(CefRefPtr<CefBrowser>, const CefString&, const CefString&) { return true; }
-void BrowserClient::OnBeforeDownload(CefRefPtr<CefBrowser>, CefRefPtr<CefDownloadItem>,
+bool BrowserClient::OnBeforeDownload(CefRefPtr<CefBrowser>, CefRefPtr<CefDownloadItem>,
     const CefString& suggested_name, CefRefPtr<CefBeforeDownloadCallback> callback)
 {
     wchar_t path[MAX_PATH]{};
@@ -42,6 +42,7 @@ void BrowserClient::OnBeforeDownload(CefRefPtr<CefBrowser>, CefRefPtr<CefDownloa
     std::filesystem::path target = std::filesystem::path(dir) / suggested_name.ToWString();
     callback->Continue(target.wstring(), false); // no save-as dialog in v0.1
     if (callbacks_.OnDownload) callbacks_.OnDownload(suggested_name.ToWString(), 0);
+    return true; // callback executed: continue the download (CEF 131)
 }
 void BrowserClient::OnDownloadUpdated(CefRefPtr<CefBrowser>, CefRefPtr<CefDownloadItem> item, CefRefPtr<CefDownloadItemCallback>)
 {

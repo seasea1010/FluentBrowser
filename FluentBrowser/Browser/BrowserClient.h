@@ -46,9 +46,9 @@ public:
     // Load
     void OnLoadingStateChange(CefRefPtr<CefBrowser> browser, bool isLoading, bool canGoBack, bool canGoForward) override;
     void OnLoadError(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, ErrorCode errorCode, const CefString& errorText, const CefString& failedUrl) override;
-    // Download (CEF 131 signatures)
+    // Download (CEF 131 signatures: OnBeforeDownload returns bool)
     bool CanDownload(CefRefPtr<CefBrowser> browser, const CefString& url, const CefString& request_method) override;
-    void OnBeforeDownload(CefRefPtr<CefBrowser> browser, CefRefPtr<CefDownloadItem> download_item,
+    bool OnBeforeDownload(CefRefPtr<CefBrowser> browser, CefRefPtr<CefDownloadItem> download_item,
         const CefString& suggested_name, CefRefPtr<CefBeforeDownloadCallback> callback) override;
     void OnDownloadUpdated(CefRefPtr<CefBrowser> browser, CefRefPtr<CefDownloadItem> download_item,
         CefRefPtr<CefDownloadItemCallback> callback) override;
