@@ -33,8 +33,24 @@ if (-not (Test-Path $Extracted)) {
             Invoke-WebRequest -Uri $Url -OutFile $Archive
         }
     }
-    Write-Host "Extracting (tar.bz2 via Windows tar)..."
-    tar -xjf $Archive -C $Dest
+    # Extract with 7-Zip when available: Windows bsdtar hung silently for ~1h on this
+    # archive in GitHub Actions run #2 (2026-11-23). Fall back to tar otherwise.
+    $SevenZip = $null
+    if (Test-Path "C:\Program Files\7-Zip\7z.exe") { $SevenZip = "C:\Program Files\7-Zip\7z.exe" }
+    elseif (Get-Command 7z -ErrorAction SilentlyContinue) { $SevenZip = "7z" }
+    if ($SevenZip) {
+        Write-Host "Extracting (tar.bz2 via 7-Zip)..."
+        $TarFile = $Archive -replace '\.bz2$', ''
+        & $SevenZip x $Archive "-o$Dest" -y | Out-Null
+        if ($LASTEXITCODE -ne 0) { throw "7-Zip bzip2 extraction failed: $LASTEXITCODE" }
+        & $SevenZip x $TarFile "-o$Dest" -y | Out-Null
+        if ($LASTEXITCODE -ne 0) { throw "7-Zip tar extraction failed: $LASTEXITCODE" }
+        Remove-Item $TarFile -Force -ErrorAction SilentlyContinue
+    } else {
+        Write-Host "Extracting (tar.bz2 via Windows tar)..."
+        tar -xjf $Archive -C $Dest
+    }
+    Write-Host "Extraction done."
 }
 if (-not (Test-Path $Extracted)) { throw "CEF extraction failed: $Extracted not found. Check `$CefVersion against the index page." }
 # Stable alias used by Cef.props
@@ -43,7 +59,8 @@ if (Test-Path $Current) { Remove-Item $Current -Recurse -Force }
 # Junction avoids copying ~1GB
 cmd /c mklink /J "`"$Current`"" "`"$Extracted`"" | Out-Null
 # Build libcef_dll_wrapper with CMake (CEF ships CMakeLists.txt at its root)
-foreach ($Cfg in @("Release","Debug")) {
+# Release only: CI builds the app in Release; Debug wrapper doubled the time for nothing.
+foreach ($Cfg in @("Release")) {
     $BuildDir = Join-Path $Extracted "build"
     cmake -S $Extracted -B $BuildDir -G "Visual Studio 17 2022" -A x64
     cmake --build $BuildDir --config $Cfg --target libcef_dll_wrapper
