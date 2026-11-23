@@ -60,9 +60,12 @@ if (Test-Path $Current) { Remove-Item $Current -Recurse -Force }
 cmd /c mklink /J "`"$Current`"" "`"$Extracted`"" | Out-Null
 # Build libcef_dll_wrapper with CMake (CEF ships CMakeLists.txt at its root)
 # Release only: CI builds the app in Release; Debug wrapper doubled the time for nothing.
+# -DCEF_RUNTIME_LIBRARY_FLAG=/MD: the app builds with /MD (WinUI needs the dynamic
+# CRT) but CEF's CMake defaults the wrapper to /MT, which failed run #8 at link time
+# with 142x LNK2038 (MT_StaticRelease vs MD_DynamicRelease).
 foreach ($Cfg in @("Release")) {
     $BuildDir = Join-Path $Extracted "build"
-    cmake -S $Extracted -B $BuildDir -G "Visual Studio 17 2022" -A x64
+    cmake -S $Extracted -B $BuildDir -G "Visual Studio 17 2022" -A x64 -DCEF_RUNTIME_LIBRARY_FLAG=/MD
     cmake --build $BuildDir --config $Cfg --target libcef_dll_wrapper
 }
 Write-Host "CEF ready: $Current"
