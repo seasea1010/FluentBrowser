@@ -31,13 +31,13 @@ namespace winrt::FluentBrowser::implementation
 
     HWND MainWindow::WindowHwnd()
     {
-        HWND hwnd{}; check_hresult(as<IWindowNative>()->get_WindowHandle(&hwnd)); return hwnd;
+        HWND hwnd{}; Window window = *this; check_hresult(window.as<IWindowNative>()->get_WindowHandle(&hwnd)); return hwnd;
     }
 
     void MainWindow::OnWindowLoaded(IInspectable const&, RoutedEventArgs const&)
     {
         RefreshLists();
-        CreateTab(store_.Settings.Homepage);
+        CreateTab(hstring(store_.Settings.Homepage));
     }
     void MainWindow::OnHostSizeChanged(IInspectable const&, SizeChangedEventArgs const&) { LayoutBrowsers(); }
     void MainWindow::OnWindowClosed(IInspectable const&, WindowEventArgs const&)
@@ -46,14 +46,14 @@ namespace winrt::FluentBrowser::implementation
         tabs_.clear();
     }
 
-    std::shared_ptr<MainWindow::TabState> MainWindow::CurrentTab()
+    std::shared_ptr<TabState> MainWindow::CurrentTab()
     {
         int i = BrowserTabs().SelectedIndex();
         if (i >= 0 && i < (int)tabs_.size()) return tabs_[i];
         return nullptr;
     }
 
-    std::shared_ptr<MainWindow::TabState> MainWindow::CreateTab(hstring const& url)
+    std::shared_ptr<TabState> MainWindow::CreateTab(hstring const& url)
     {
         auto tab = std::make_shared<TabState>();
         tab->Url = url;
@@ -92,7 +92,7 @@ namespace winrt::FluentBrowser::implementation
         };
         cb.OnShortcut = [self](std::string const& a) {
             self->dispatcher_.TryEnqueue([self, a]() {
-                if (a == "newtab") self->CreateTab(self->store_.Settings.Homepage);
+                if (a == "newtab") self->CreateTab(hstring(self->store_.Settings.Homepage));
                 else if (a == "closetab") { if (auto t = self->CurrentTab()) { int i = self->BrowserTabs().SelectedIndex(); self->Tabs_TabCloseRequested(self->BrowserTabs(), nullptr); (void)i; (void)t; } }
                 else if (a == "focusbar") { self->AddressBox().Focus(FocusState::Keyboard); self->AddressBox().SelectAll(); }
                 else if (a == "reload") { if (auto t = self->CurrentTab(); t && t->Client && t->Client->Browser()) t->Client->Browser()->Reload(); }
@@ -184,8 +184,8 @@ namespace winrt::FluentBrowser::implementation
     }
 
     // ---- XAML handlers ----
-    void MainWindow::AddTab_Click(TabView const&, IInspectable const&) { CreateTab(store_.Settings.Homepage); }
-    void MainWindow::NewTabMenu_Click(IInspectable const&, RoutedEventArgs const&) { CreateTab(store_.Settings.Homepage); }
+    void MainWindow::AddTab_Click(TabView const&, IInspectable const&) { CreateTab(hstring(store_.Settings.Homepage)); }
+    void MainWindow::NewTabMenu_Click(IInspectable const&, RoutedEventArgs const&) { CreateTab(hstring(store_.Settings.Homepage)); }
     void MainWindow::Tabs_SelectionChanged(IInspectable const&, SelectionChangedEventArgs const&)
     {
         if (auto t = CurrentTab()) AddressBox().Text(t->Url);
@@ -202,12 +202,12 @@ namespace winrt::FluentBrowser::implementation
         if (tab->Host) DestroyWindow(tab->Host);
         BrowserTabs().TabItems().RemoveAt(idx);
         tabs_.erase(tabs_.begin() + idx);
-        if (tabs_.empty()) CreateTab(store_.Settings.Homepage); else LayoutBrowsers();
+        if (tabs_.empty()) CreateTab(hstring(store_.Settings.Homepage)); else LayoutBrowsers();
     }
     void MainWindow::Back_Click(IInspectable const&, RoutedEventArgs const&) { if (auto t = CurrentTab(); t && t->Client && t->Client->Browser()) t->Client->Browser()->GoBack(); }
     void MainWindow::Forward_Click(IInspectable const&, RoutedEventArgs const&) { if (auto t = CurrentTab(); t && t->Client && t->Client->Browser()) t->Client->Browser()->GoForward(); }
     void MainWindow::Reload_Click(IInspectable const&, RoutedEventArgs const&) { if (auto t = CurrentTab(); t && t->Client && t->Client->Browser()) { if (t->Loading) t->Client->Browser()->StopLoad(); else t->Client->Browser()->Reload(); } }
-    void MainWindow::Home_Click(IInspectable const&, RoutedEventArgs const&) { NavigateCurrent(store_.Settings.Homepage); }
+    void MainWindow::Home_Click(IInspectable const&, RoutedEventArgs const&) { NavigateCurrent(hstring(store_.Settings.Homepage)); }
     void MainWindow::Favorite_Click(IInspectable const&, RoutedEventArgs const&)
     {
         auto t = CurrentTab(); if (!t) return;
@@ -249,7 +249,7 @@ namespace winrt::FluentBrowser::implementation
         ComboBox eng; eng.Items().Append(box_value(hstring(L"Google"))); eng.Items().Append(box_value(hstring(L"Bing"))); eng.Items().Append(box_value(hstring(L"DuckDuckGo")));
         eng.SelectedIndex(store_.Settings.SearchEngine == L"Bing" ? 1 : store_.Settings.SearchEngine == L"DuckDuckGo" ? 2 : 0);
         TextBlock homeLabel; homeLabel.Text(L"ホームページ");
-        TextBox home; home.Text(store_.Settings.Homepage);
+        TextBox home; home.Text(hstring(store_.Settings.Homepage));
         TextBlock themeLabel; themeLabel.Text(L"テーマ");
         ComboBox theme; theme.Items().Append(box_value(hstring(L"既定"))); theme.Items().Append(box_value(hstring(L"ライト"))); theme.Items().Append(box_value(hstring(L"ダーク")));
         theme.SelectedIndex(store_.Settings.Theme == L"Light" ? 1 : store_.Settings.Theme == L"Dark" ? 2 : 0);
