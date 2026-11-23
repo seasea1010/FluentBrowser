@@ -21,6 +21,13 @@
     <AppxBundle>Never</AppxBundle>
     <UseWinUI>true</UseWinUI>
     <EnableMsixTooling>false</EnableMsixTooling>
+    <!-- CppWinRTOptimized (-opt): without it, cppwinrt generates module.g.cpp with
+         #include "App.h" / "MainWindow.h" / "XamlMetaDataProvider.h" (component
+         skeleton headers that live only in Generated Files\sources\ and are not on
+         the include path) -> C1083. With -opt, module.g.cpp uses winrt_make_* forward
+         declarations instead, and the targets compile XamlMetaDataProvider.cpp. This
+         matches the VS Blank App template (its checked-in module.g.cpp is -opt form). -->
+    <CppWinRTOptimized>true</CppWinRTOptimized>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">

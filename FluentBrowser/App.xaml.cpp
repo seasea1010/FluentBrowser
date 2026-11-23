@@ -46,16 +46,16 @@ int __stdcall wWinMain(HINSTANCE instance, HINSTANCE, PWSTR, int)
 // build, but they are required at link time:
 //  - module.g.cpp defines WINRT_GetActivationFactory/WINRT_CanUnloadNow, which the
 //    WinAppSDK 1.7 XAML compiler's XamlTypeInfo.g.cpp references (VSDesigner block).
-//  - App.g.cpp / XamlMetaDataProvider.g.cpp define the activation factories that
-//    module.g.cpp dispatches to (winrt_make_FluentBrowser_App / _XamlMetaDataProvider).
+//  - App.g.cpp defines winrt_make_FluentBrowser_App plus the App constructor glue
+//    (CppWinRTOptimized/-opt form; the non-opt form has no ctor glue).
 // Included here (same pattern as MainWindow.g.cpp in MainWindow.xaml.cpp) so no
 // explicit ClCompile item for a not-yet-generated file is needed.
+// NOTE: XamlMetaDataProvider.g.cpp is intentionally NOT included here: with
+// CppWinRTOptimized=true the CppWinRT targets compile XamlMetaDataProvider.cpp
+// (which includes it), so including it here too would duplicate the symbols.
 #if __has_include("module.g.cpp")
 #include "module.g.cpp"
 #endif
 #if __has_include("App.g.cpp")
 #include "App.g.cpp"
-#endif
-#if __has_include("XamlMetaDataProvider.g.cpp")
-#include "XamlMetaDataProvider.g.cpp"
 #endif
