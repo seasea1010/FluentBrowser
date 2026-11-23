@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Included for template compatibility. This app is UNPACKAGED (WindowsPackageType=None),
+     so this manifest is not used to produce an MSIX. Identity is informational only. -->
+<Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+         xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+         xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+         IgnorableNamespaces="uap rescap">
+  <Identity Name="FluentBrowser" Publisher="CN=seasea" Version="0.1.0.0" ProcessorArchitecture="x64" />
+  <Properties><DisplayName>FluentBrowser</DisplayName><PublisherDisplayName>seasea</PublisherDisplayName></Properties>
+  <Dependencies><TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.17763.0" MaxVersionTested="10.0.26100.0" /></Dependencies>
+  <Resources><Resource Language="ja-JP" /></Resources>
+  <Applications>
+    <Application Id="App" Executable="FluentBrowser.exe" EntryPoint="Windows.FullTrustApplication">
+      <uap:VisualElements DisplayName="FluentBrowser" Description="Fluent UI browser (WinUI 3 + CEF)" BackgroundColor="transparent" ><uap:DefaultTile/></uap:VisualElements>
+    </Application>
+  </Applications>
+  <Capabilities><rescap:Capability Name="runFullTrust" /></Capabilities>
+</Package>

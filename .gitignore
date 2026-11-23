@@ -1,0 +1,10 @@
+.vs/
+x64/
+Debug/
+Release/
+packages/
+third_party/cef/
+dist/
+*.user
+*.suo
+FluentBrowser/x64/

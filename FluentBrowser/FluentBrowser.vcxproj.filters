@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup><Filter Include="Browser"><UniqueIdentifier>{11111111-2222-3333-4444-555555555555}</UniqueIdentifier></Filter></ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Browser\CefHost.h"><Filter>Browser</Filter></ClInclude>
+    <ClInclude Include="Browser\BrowserClient.h"><Filter>Browser</Filter></ClInclude>
+    <ClInclude Include="Browser\DataStore.h"><Filter>Browser</Filter></ClInclude>
+    <ClCompile Include="Browser\CefHost.cpp"><Filter>Browser</Filter></ClCompile>
+    <ClCompile Include="Browser\BrowserClient.cpp"><Filter>Browser</Filter></ClCompile>
+    <ClCompile Include="Browser\DataStore.cpp"><Filter>Browser</Filter></ClCompile>
+  </ItemGroup>
+</Project>
