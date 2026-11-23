@@ -1,0 +1,23 @@
+name: Build FluentBrowser
+on:
+  push:
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup NuGet
+        uses: NuGet/setup-nuget@v2
+      - name: Fetch CEF + build wrapper
+        shell: pwsh
+        run: .\scripts\fetch-cef.ps1
+      - name: Build + assemble portable folder
+        shell: pwsh
+        run: .\scripts\build.ps1
+      - name: Upload portable zip
+        uses: actions/upload-artifact@v4
+        with:
+          name: FluentBrowser-win-x64
+          path: dist/FluentBrowser-win-x64.zip
+          if-no-files-found: error
