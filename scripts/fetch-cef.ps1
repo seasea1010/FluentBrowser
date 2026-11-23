@@ -4,7 +4,7 @@ $ErrorActionPreference = "Stop"
 # === CEF version (edit here if needed) ===
 # Verify the exact string on https://cef-builds.spotifycdn.com/index.html#windows64
 # Pattern: cef_binary_<CEF_VERSION>_windows64.tar.bz2  ('+' is URL-encoded as %2B)
-$CefVersion = "131.3.5+gdda98e2+chromium-131.0.6778.205"
+$CefVersion = "131.3.5+g573cec5+chromium-131.0.6778.205"
 $Root = Split-Path -Parent $PSScriptRoot
 $Dest = Join-Path $Root "third_party\cef"
 New-Item -ItemType Directory -Force $Dest | Out-Null
@@ -15,7 +15,23 @@ $Extracted = Join-Path $Dest "cef_binary_$($CefVersion)_windows64"
 if (-not (Test-Path $Extracted)) {
     if (-not (Test-Path $Archive)) {
         Write-Host "Downloading $Url"
-        Invoke-WebRequest -Uri $Url -OutFile $Archive
+        try {
+            Invoke-WebRequest -Uri $Url -OutFile $Archive
+        } catch {
+            # Fallback: resolve the exact build for this Chromium version from the CEF index
+            Write-Host "Pinned build not found, resolving from CEF index..."
+            $ChromiumVer = ($CefVersion -split 'chromium-')[1]
+            $Index = Invoke-RestMethod -Uri "https://cef-builds.spotifycdn.com/index.json"
+            $Entry = $Index.windows64.versions | Where-Object { $_.chromium_version -eq $ChromiumVer -and $_.channel -eq "stable" } | Select-Object -First 1
+            if (-not $Entry) { throw "No windows64 CEF build found in index for Chromium $ChromiumVer" }
+            $script:CefVersion = $Entry.cef_version
+            $Archive = Join-Path $Dest "cef_binary_$($CefVersion)_windows64.tar.bz2"
+            $Encoded = $CefVersion -replace '\+', '%2B'
+            $Url = "https://cef-builds.spotifycdn.com/cef_binary_$($Encoded)_windows64.tar.bz2"
+            $script:Extracted = Join-Path $Dest "cef_binary_$($CefVersion)_windows64"
+            Write-Host "Resolved $CefVersion, downloading $Url"
+            Invoke-WebRequest -Uri $Url -OutFile $Archive
+        }
     }
     Write-Host "Extracting (tar.bz2 via Windows tar)..."
     tar -xjf $Archive -C $Dest
