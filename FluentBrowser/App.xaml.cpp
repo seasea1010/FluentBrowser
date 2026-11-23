@@ -41,3 +41,21 @@ int __stdcall wWinMain(HINSTANCE instance, HINSTANCE, PWSTR, int)
     FluentBrowserCef::ShutdownCef();
     return 0;
 }
+
+// C++/WinRT generated component sources. No .targets file adds these to the
+// build, but they are required at link time:
+//  - module.g.cpp defines WINRT_GetActivationFactory/WINRT_CanUnloadNow, which the
+//    WinAppSDK 1.7 XAML compiler's XamlTypeInfo.g.cpp references (VSDesigner block).
+//  - App.g.cpp / XamlMetaDataProvider.g.cpp define the activation factories that
+//    module.g.cpp dispatches to (winrt_make_FluentBrowser_App / _XamlMetaDataProvider).
+// Included here (same pattern as MainWindow.g.cpp in MainWindow.xaml.cpp) so no
+// explicit ClCompile item for a not-yet-generated file is needed.
+#if __has_include("module.g.cpp")
+#include "module.g.cpp"
+#endif
+#if __has_include("App.g.cpp")
+#include "App.g.cpp"
+#endif
+#if __has_include("XamlMetaDataProvider.g.cpp")
+#include "XamlMetaDataProvider.g.cpp"
+#endif
