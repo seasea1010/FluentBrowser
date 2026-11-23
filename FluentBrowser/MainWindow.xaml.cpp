@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "MainWindow.xaml.h"
+#if __has_include("MainWindow.g.cpp")
 #include "MainWindow.g.cpp"
+#endif
 #include "Browser/CefHost.h"
 #include "include/cef_browser.h"
 #include "include/cef_request_context.h"

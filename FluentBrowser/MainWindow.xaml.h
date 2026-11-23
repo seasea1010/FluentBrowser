@@ -1,5 +1,5 @@
 #pragma once
-#include "MainWindow.xaml.g.h"
+#include "MainWindow.g.h"
 #include "Browser/BrowserClient.h"
 #include "Browser/DataStore.h"
 #include <map>
