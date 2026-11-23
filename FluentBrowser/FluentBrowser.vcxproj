@@ -89,7 +89,11 @@
     <ClInclude Include="Browser\DataStore.h" />
   </ItemGroup>
   <ItemGroup>
-    <Midl Include="App.idl" />
+    <!-- NOTE: App.idl is intentionally NOT a Midl item. The VS Blank App template has
+         no App.idl: App is a XAML-only class (AppT from App.xaml.g.h), not a winmd
+         runtime class. Making App a runtime class breaks the -opt App.g.cpp glue
+         (C2665: make<implementation::App>() yields Application, and the projected App
+         has no ctor from Application). App.idl remains in the tree, unreferenced. -->
     <Midl Include="MainWindow.idl" />
   </ItemGroup>
   <ItemGroup>

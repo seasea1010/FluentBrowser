@@ -1,5 +1,5 @@
 #pragma once
-#include "App.g.h"
+#include "App.xaml.g.h"
 namespace winrt::FluentBrowser::implementation
 {
     struct App : AppT<App>
@@ -10,8 +10,4 @@ namespace winrt::FluentBrowser::implementation
     private:
         winrt::Microsoft::UI::Xaml::Window window{ nullptr };
     };
-}
-namespace winrt::FluentBrowser::factory_implementation
-{
-    struct App : AppT<App, implementation::App> {};
 }

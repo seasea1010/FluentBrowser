@@ -42,20 +42,14 @@ int __stdcall wWinMain(HINSTANCE instance, HINSTANCE, PWSTR, int)
     return 0;
 }
 
-// C++/WinRT generated component sources. No .targets file adds these to the
-// build, but they are required at link time:
-//  - module.g.cpp defines WINRT_GetActivationFactory/WINRT_CanUnloadNow, which the
-//    WinAppSDK 1.7 XAML compiler's XamlTypeInfo.g.cpp references (VSDesigner block).
-//  - App.g.cpp defines winrt_make_FluentBrowser_App plus the App constructor glue
-//    (CppWinRTOptimized/-opt form; the non-opt form has no ctor glue).
-// Included here (same pattern as MainWindow.g.cpp in MainWindow.xaml.cpp) so no
-// explicit ClCompile item for a not-yet-generated file is needed.
-// NOTE: XamlMetaDataProvider.g.cpp is intentionally NOT included here: with
-// CppWinRTOptimized=true the CppWinRT targets compile XamlMetaDataProvider.cpp
-// (which includes it), so including it here too would duplicate the symbols.
+// C++/WinRT generated component source. No .targets file adds it to the build,
+// but it is required at link time: module.g.cpp defines WINRT_GetActivationFactory
+// / WINRT_CanUnloadNow, which the WinAppSDK 1.7 XAML compiler's XamlTypeInfo.g.cpp
+// references (VSDesigner block). Included here (same pattern as MainWindow.g.cpp
+// in MainWindow.xaml.cpp) so no explicit ClCompile item for a not-yet-generated
+// file is needed. (There is no App.g.cpp: App is a XAML-only class, not a winmd
+// runtime class, so no winrt_make_FluentBrowser_App exists. XamlMetaDataProvider's
+// factory comes from the targets-compiled XamlMetaDataProvider.cpp under -opt.)
 #if __has_include("module.g.cpp")
 #include "module.g.cpp"
-#endif
-#if __has_include("App.g.cpp")
-#include "App.g.cpp"
 #endif
